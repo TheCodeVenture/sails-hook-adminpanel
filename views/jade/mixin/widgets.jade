@@ -1,0 +1,133 @@
+mixin fieldWidget(key, field, value, instance)
+  if (typeof value === 'undefined' && typeof field.model.defaultsTo !== 'undefined')
+    - value = field.model.defaultsTo
+
+  if locals.adminpanel.configHelper.isId(field, instance.config.model)
+    - field.config.disabled = true; //Disable identifier field
+    +inputText(key, field, value)
+  else
+    - var type = field.config.type || field.model.type
+    case type
+      when 'association'
+        +inputModel(key, field, value)
+      when 'association-many'
+        +inputSelectMany(key, field, value)
+      when 'string'
+        +inputText(key, field, value)
+      when 'password'
+        +inputPassword(key, field, value)
+      when 'date'
+        +inputDate(key, field, value)
+      when 'datetime'
+        +inputDatetime(key, field, value)
+      when 'integer'
+        +inputNumber(key, field, value)
+      when 'float'
+        +inputNumber(key, field, value)
+      when 'number'
+        +inputNumber(key, field, value)
+      when 'boolean'
+        +inputCheckbox(key, field, value)
+      when 'binary'
+        +inputCheckbox(key, field, value)        
+      when 'text'
+        +textarea(key, field, value)
+      when 'mediumtext'
+        +textarea(key, field, value)
+      when 'longtext'
+        +textarea(key, field, value)
+      when 'json'
+        +textarea(key, field, JSON.stringify(value))
+      when 'array'
+        +textarea(key, field, value)
+      default
+        +inputText(key, field, value)
+
+mixin inputText(key, field, value)
+  if field.model.enum
+    +select(key, field, value)
+  else if field.model.email
+    paper-input(type='email', label=field.config.title, name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false, value=value)
+  else if field.config.file
+    paper-input(type='file', label=field.config.title, name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false, value=value)
+  else
+    paper-input(type='text', label=field.config.title, name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false, value=value)
+
+mixin inputPassword(key, field, value)
+  paper-input(type='password', label=field.config.title, name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false value=value)
+
+mixin inputDate(key, field, value)
+  paper-input(type='date', label=field.config.title, name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false, value=value)
+
+mixin inputDatetime(key, field, value)
+  paper-input(type='datetime', label=field.config.title, name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false, value=value)
+
+mixin inputNumber(key, field, value)
+  paper-input(type='number', label=field.config.title, name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false value=value)
+
+mixin inputCheckbox(key, field, value)
+  .widget
+    paper-checkbox(type='checkbox', name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false value='1', checked=value) #{field.config.title}
+
+mixin select(key, field, value)
+  .widget
+    | &nbsp;#{field.config.title}&nbsp;
+    select(name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false)
+      if (field.config.enum && typeof field.config.enum === 'object')
+        each opt, optKey in field.config.enum
+          option(value=optKey, selected=(optKey == value)) #{opt}
+      else
+        each opt in field.model.enum
+          option(value=opt, selected=(opt == value)) #{opt}
+
+mixin textarea(key, field, value)
+  if field.config.editor
+    | &nbsp;#{field.config.title}
+    br
+    textarea(name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false) #{value}
+  else
+    paper-textarea(name=key, value=value, label=field.config.title, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false)
+
+mixin inputModel(key, field, value)
+  .widget
+    | &nbsp;#{field.config.title}&nbsp;
+    //model-select(name=key, required=field.config.required || false, disabled=field.config.disabled || false, value=value)
+    select(name=key, id='form-#{key}', required=field.config.required || false, disabled=field.config.disabled || false)
+      if !field.config.required
+        option(value='') --- Select please ---
+      if field.config.records
+        each opt in field.config.records
+          option(value=opt[field.config.identifierField],
+                  selected=(opt[field.config.identifierField] == value)) #{opt[field.config.displayField]}
+      else
+        option(value='') --- No records found ---
+
+mixin inputSelectMany(key, field, value)
+  .widget
+    | &nbsp;#{field.config.title}&nbsp;
+    //model-select(name=key, required=field.config.required || false, disabled=field.config.disabled || false, value=value)
+    select(name=key, id='form-#{key}', multiple='', required=field.config.required || false, disabled=field.config.disabled || false).multi
+      if field.config.records
+        each opt in field.config.records
+          option(value=opt[field.config.identifierField],
+            selected=(locals.adminpanel.viewHelper.isOptionSelected(opt[field.config.identifierField], value))) #{opt[field.config.displayField]}
+      else
+        option(value='') --- No records found ---
+
+mixin installEditors(fields, record)
+  script(type='text/javascript')
+    | var jsonEditor = {};
+    each field, key in fields
+      if field.config.editor
+        if field.config.type == 'text'
+          | CKEDITOR.replace( 'form-#{key}' );
+        else if field.config.type == 'json'
+          - var value = record ? locals.adminpanel.viewHelper.getFieldValue(key, field, record) : {};
+          | $('#form-#{key}').hide().after('<div id="form-#{key}-jsoneditor" style="height:320px;"></div>');
+          | jsonEditor['#{key}'] = new JSONEditor(
+          |   $('#form-#{key}-jsoneditor')[0],
+          |   {
+          |     modes: ['view', 'tree', 'code']
+          |   },
+          |   !{typeof value === 'object' ? JSON.stringify(value) : JSON.parse(JSON.stringify(value))}
+          | );
