@@ -120,36 +120,15 @@ module.exports = {
                 config.title = key;
             }
             //validate associations
-            if (config.type === 'association') {
-                if (!config.identifierField) {
-                    config.identifierField = 'id';
-                }
-                if (!config.displayField) {
-                    config.displayField = 'id';
-                }
+            if (config.type === 'association' || config.type === 'association-many') {
+                _.defaults(config, {
+                    identifierField: 'id',
+                    displayField: 'id'
+                });
             }
             return config;
         }
         return false;
-    },
-
-    /**
-     * Checks if given field is identifier of model
-     *
-     * @param {Object} field
-     * @returns {boolean}
-     */
-    isId: function(field) {
-        return (field.config.key == util.config().identifierField);
-    },
-
-    /**
-     * Get Identifier field name from config
-     *
-     * @returns {string}
-     */
-    getidentifierFieldName: function() {
-        return util.config().identifierField;
     },
 
     /**
@@ -168,11 +147,16 @@ module.exports = {
          * @param {function=} [cb]
          */
         var loadAssoc = function(key, cb) {
-            if (fields[key].config.type !== 'association') {
+            if (fields[key].config.type !== 'association' && fields[key].config.type !== 'association-many') {
                 return cb();
             }
             fields[key].config.records = [];
-            var Model = util.getModel(fields[key].model.model);
+            var modelName = fields[key].model.model || fields[key].model.collection;
+            if (!modelName) {
+                sails.log.error('No model found for field: ', fields[key]);
+                return cb();
+            }
+            var Model = util.getModel(modelName);
             if (!Model) {
                 return cb();
             }
@@ -202,7 +186,7 @@ module.exports = {
     getFieldsToPopulate: function(fields) {
         var result = [];
         _.forEach(fields, function(field, key) {
-            if (field.config.type === 'association') {
+            if (field.config.type === 'association' || field.config.type === 'association-many') {
                 result.push(key);
             }
         });
@@ -246,10 +230,10 @@ module.exports = {
         var fieldsConfig = instance.config.fields || {};
 
         //Get keys from config
-        var actionConfigFields = _.keys(actionConfig.fields);
+        //var actionConfigFields = _.keys(actionConfig.fields);
         //Getting list of fields from model
         var modelAttributes = _.pick(instance.model.attributes, function(val, key) {
-            return ((_.isPlainObject(val) || _.isString(val)) && !val.collection);
+            return (_.isPlainObject(val) || _.isString(val));
         });
 
         var that = this;
@@ -273,6 +257,9 @@ module.exports = {
             }
             if (_.isObject(modelField) && modelField.model) {
                 modelField.type = 'association';
+            }
+            if (_.isObject(modelField) && modelField.collection) {
+                modelField.type = 'association-many';
             }
             if (type === 'add' && key === req._sails.config.adminpanel.identifierField) {
                 return;
@@ -311,6 +298,8 @@ module.exports = {
              * Could be fetched form config file or file model if not defined in config file.
              */
             fldConfig.type = fldConfig.type || modelField.type;
+            // All field types should be in lower case
+            fldConfig.type = fldConfig.type.toLowerCase();
             //nomalizing configs
             fldConfig = that._normalizeFieldConfig(fldConfig, key)
             //Adding new field to resultset

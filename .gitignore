@@ -43,6 +43,7 @@
 
 node_modules
 bower_components
+assets/bower_components
 
 
 
@@ -72,7 +73,8 @@ lib-cov
 *.out
 *.pid
 npm-debug.log
-
+*.swp
+*.swo
 
 
 

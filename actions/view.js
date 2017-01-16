@@ -20,17 +20,20 @@ module.exports = function(req, res) {
     }
     var fields = fieldsHelper.getFields(req, instance, 'view');
 
-    var query = instance.model.findOne(req.param('id'))
-    fieldsHelper.getFieldsToPopulate(fields).forEach(function(val) {
-        query.populate(val);
-    });
+    var query = instance.model
+        .findOne(req.param('id'))
+        .populateAll();
+
+    //fieldsHelper.getFieldsToPopulate(fields).forEach(function(val) {
+    //    query.populate(val);
+    //});
     query.exec(function(err, record) {
             if (err) {
                 req._sails.log.error('Admin edit error: ');
                 req._sails.log.error(err);
                 return res.serverError();
             }
-            res.view(views.getViewPath('view'), {
+            res.viewAdmin({
                 instance: instance,
                 record: record,
                 fields: fields

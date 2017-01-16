@@ -1,7 +1,7 @@
 mixin listHead(fields)
   tr
     each field, key in fields
-      th.text-capitalize
+      th
         a(href=sortingHelper.generateLink(req, key)) #{field.config.title}&nbsp;
         if req.sort && req.sort.key == key
           i(class=(req.sort.order == 'desc' ? 'glyphicon-sort-by-alphabet-alt' : 'glyphicon-sort-by-alphabet')).glyphicon
@@ -9,25 +9,28 @@ mixin listHead(fields)
 
 
 mixin listRow(obj, instance)
+  - var idField = locals.adminpanel.configHelper.getIdentifierField(instance.config.model);
   tr
     each field, key in fields
       +listValue(key, field, obj[key])
       // adding actions
-    td
+    td.actions
+      +inlineListActions(instance, obj)
+
       if instance.config.view
         | &nbsp;
-        a(href='#{instance.uri}/view/#{obj.id}').btn.btn-info
-          i.glyphicon.glyphicon-eye-open
+        a(href='#{instance.uri}/view/#{obj[idField]}')
+          iron-icon(icon='visibility')
 
       if instance.config.edit
         | &nbsp;
-        a(href='#{instance.uri}/edit/#{obj.id}').btn.btn-info
-          i.glyphicon.glyphicon-pencil
+        a(href='#{instance.uri}/edit/#{obj[idField]}')
+          iron-icon(icon='create')
           //| &nbsp;#{__('Edit')}
       if instance.config.remove
         | &nbsp;
-        a(href='#{instance.uri}/remove/#{obj.id}', onclick="return confirm('#{__('Are you sure ?')}')").btn.btn-danger
-          i.glyphicon.glyphicon-trash
+        a(href='#{instance.uri}/remove/#{obj[idField]}', onclick="return confirm('#{__('Are you sure ?')}')")
+          iron-icon(icon='delete')
 
 mixin listValue(key, field, value)
   case field.model.type
@@ -38,13 +41,17 @@ mixin listValue(key, field, value)
         td #{value}
       else
         td #{value && value[field.config.displayField] ? value[field.config.displayField] : '&nbsp;'}
-
+    when 'association-many'
+      if(value.length)
+        td #{_.pluck(value, field.config.displayField).join(', ')}
+      else
+        td &nbsp;
     when 'boolean'
       td
         if value
-          i.glyphicon.glyphicon-ok-sign
+          iron-icon(icon="check-circle")
         else
-          i.glyphicon.glyphicon-remove-sign
+          iron-icon(icon="cancel")
     default
       if field.config.enum
         td #{field.config.enum[value]}
