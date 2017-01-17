@@ -12,17 +12,26 @@
     <!-- Viewport mobile tag for sensible mobile support -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
-    <script type="text/javascript" src="/admin/vendor/webcomponentsjs/webcomponents-lite.min.js"></script>
 
-    <link rel="import" href="/admin/polymer/elements.html">
-    <link rel="import" href="/admin/polymer/admin-styles/admin-styles.html">
-
-    <link rel="stylesheet" type="text/css" href="/admin/styles/importer.css">
-    <link rel="stylesheet" type="text/css" href="/admin/bower_components/jsoneditor/dist/jsoneditor.min.css">
-
-    <script type="text/javascript" src="/admin/vendor/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="/admin/vendor/ckeditor/ckeditor.js"></script>
-    <script type="text/javascript" src="/admin/bower_components/jsoneditor/dist/jsoneditor.min.js"></script>
+    <% if (process.env.NODE_ENV === 'development') { %>
+      <script type="text/javascript" src="/admin/vendor/webcomponentsjs/webcomponents-lite.min.js"></script>
+      <link rel="import" href="/admin/polymer/elements.html">
+      <link rel="import" href="/admin/polymer/admin-styles/admin-styles.html">
+      <link rel="stylesheet" type="text/css" href="/admin/styles/importer.css">
+      <link rel="stylesheet" type="text/css" href="/admin/bower_components/jsoneditor/dist/jsoneditor.min.css">
+      <script type="text/javascript" src="/admin/vendor/jquery/dist/jquery.min.js"></script>
+      <script type="text/javascript" src="/admin/vendor/ckeditor/ckeditor.js"></script>
+      <script type="text/javascript" src="/admin/bower_components/jsoneditor/dist/jsoneditor.min.js"></script>
+    <% } else { %>
+      <script type="text/javascript" src="https://s3.eu-west-2.amazonaws.com/<%= process.env.BUCKET_NAME %>/www/admin/vendor/webcomponentsjs/webcomponents-lite.min.js"></script>
+      <link rel="import" href="https://s3.eu-west-2.amazonaws.com/<%= process.env.BUCKET_NAME %>/www/admin/polymer/elements-vulcanized.html">
+      <link rel="import" href="https://s3.eu-west-2.amazonaws.com/<%= process.env.BUCKET_NAME %>/www/admin/polymer/admin-styles/admin-styles.html">
+      <link rel="stylesheet" type="text/css" href="https://s3.eu-west-2.amazonaws.com/<%= process.env.BUCKET_NAME %>/www/admin/styles/importer.css">
+      <link rel="stylesheet" type="text/css" href="https://s3.eu-west-2.amazonaws.com/<%= process.env.BUCKET_NAME %>/www/admin/bower_components/jsoneditor/dist/jsoneditor.min.css">
+      <script type="text/javascript" src="https://s3.eu-west-2.amazonaws.com/<%= process.env.BUCKET_NAME %>/www/admin/vendor/jquery/dist/jquery.min.js"></script>
+      <script type="text/javascript" src="https://s3.eu-west-2.amazonaws.com/<%= process.env.BUCKET_NAME %>/www/admin/vendor/ckeditor/ckeditor.js"></script>
+      <script type="text/javascript" src="https://s3.eu-west-2.amazonaws.com/<%= process.env.BUCKET_NAME %>/www/admin/bower_components/jsoneditor/dist/jsoneditor.min.js"></script>
+    <% } %>
   </head>
   <body class="fullbleed layout vertical">
       <paper-drawer-panel>
