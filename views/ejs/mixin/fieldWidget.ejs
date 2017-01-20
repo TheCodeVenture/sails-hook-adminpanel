@@ -3,8 +3,8 @@
 <% } %>
 
 <% var type = field.config.type || field.model.type %>
-<% var inputTextTypes = ['string', 'password', 'date', 'datetime', 'integer', 'number', 'float'] %>
-<% if (~inputTextTypes.indexOf(type)) { %>
+<% var inputTextTypes = ['string', 'password', 'email', 'date', 'datetime', 'integer', 'number', 'float'] %>
+<% if (inputTextTypes.indexOf(type) >= 0) { %>
     <% include form/inputText %>
 <% } %>
 

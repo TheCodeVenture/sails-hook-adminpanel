@@ -1,3 +1,5 @@
+<p><%=field.model.type%></p>
+<p><%=value%></p>
 <% if (field.model.enum) { %>
     <% include select %>
 <% } else if(field.model.email) { %>
@@ -9,6 +11,9 @@
 <% } else { %>
     <%
     var fieldType = 'text'
+    if (type == "email") {
+        fieldType = 'email'
+    }
     if (type == "password") {
         fieldType = 'password'
     }
@@ -16,7 +21,7 @@
         fieldType = 'date'
     }
     if (type == "datetime") {
-        fieldType = 'datetime'
+        fieldType = 'datetime-local'
     }
     if (type == "integer" || type == 'float' || type == "number") {
         fieldType = 'number'
@@ -29,8 +34,8 @@
             type="<%= fieldType %>"
             <% field.config.required && 'required' %>
             <% field.config.disabled && 'disabled'%>
-            value="<%= value || '' %>"
-            name="<%= key %>"></paper-input>
+            committedValue="<%= value || '' %>"
+            name="<%= key %>">
+    </paper-input>
     <br/>
 <% } %>
-

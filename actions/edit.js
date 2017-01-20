@@ -45,12 +45,16 @@ module.exports = function (req, res) {
             if (req.method.toUpperCase() !== 'POST') {
               return done()
             }
+            console.log('modelFields', modelFields)
             request.processRequest(req, modelFields, function (err, reqData) {
-              if (err) done(err)
+              if (err) return req._sails.log.error(err)
               _.merge(record, reqData) // merging values from request to record
               var params = {}
               params[req._sails.config.adminpanel.identifierField] = req.param('id')
+              console.log('record', record)
+              console.log('reqData', reqData)
               instance.model.update(params, reqData).exec(function (err, newRecord) {
+                console.log('CHEGUEI CABRAO')
                 if (err) {
                   req._sails.log.error(err)
                   req.flash('adminError', err.details || 'Something went wrong...')
