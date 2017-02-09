@@ -1,9 +1,9 @@
 <% if (adminpanel.menuHelper.hasGlobalActions(instance.config, actionType)) { %>
-    <% var actions = adminpanel.menuHelper.getGlobalactions(instance.config, actionType) %>
+    <% var actions = adminpanel.menuHelper.getGlobalActions(instance.config, actionType) %>
     <% if (actions && actions.length > 0) { %>
         <% actions.forEach(function(action) { %>
-            <a href="<%= adminpanel.menuHelper.replaceModelFields(action.link, record) %>">
-                <paper-button raised>
+            <a href="<%= adminpanel.menuHelper.replaceModelFields(action.link) %>">
+                <paper-button raised class="button-blue" style="margin-bottom: 10px;">
                     <% if (action.icon) { %>
                         <iron-icon icon="<%= action.icon %>"></iron-icon>
                     <% } %>
