@@ -3,7 +3,7 @@
     <% Object.keys(fields).forEach(function(key) { %>
         <% var field = fields[key] %>
         <% var value = obj[key] %>
-        <td>
+        <td class="text-content-container">
         <% if (field.model.type == "boolean") { %>
             <iron-icon icon="<%=value ? "check-circle" : "cancel" %>"></iron-icon>
         <% } else if (field.model.type == "association") { %>
@@ -21,8 +21,15 @@
                &nbsp;
             <% } %>
         <% } else { %>
+            <% var textAreaTypes = ['text', 'longtext', 'mediumtext', 'json', 'array'] %>
             <% if (field.config.enum) { %>
                 <%= field.config.enum[value] %>
+            <% } else if (field.config.type === 'image') { %>
+                <img class='image-field' src=<%- value %>>
+            <% } else if (textAreaTypes.indexOf(field.config.type)) { %>
+                <div class='text-field'>
+                  <%= value %>
+                </div>
             <% } else { %>
                 <%= value %>
             <% } %>

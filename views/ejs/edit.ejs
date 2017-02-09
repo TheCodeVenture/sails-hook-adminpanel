@@ -54,7 +54,9 @@
     var jsonEditor = {}; // Store JSONEditor instance
     <% Object.keys(fields).forEach(function(key) { %>
         <% if (fields[key].config.editor) { %>
-            <% if (fields[key].config.type == 'text') { %>
+            <% if (fields[key].config.type === 'image') { %>
+                <% return; %> // skip picture submission, it has its own endpoint
+            <% } else if (fields[key].config.type == 'text') { %>
                 CKEDITOR.replace( 'form-<%= key %>' );
             <% } else if (fields[key].config.type == 'json') { %>
                 <% var field = fields[key] %>

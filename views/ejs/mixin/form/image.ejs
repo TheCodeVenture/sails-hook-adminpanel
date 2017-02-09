@@ -1,0 +1,54 @@
+<div class="widget">
+  <%= field.config.title %>
+  <br/>
+  <div id='image-container'>
+    <% if (value) { %>
+      <img id='image-field' class='image-field' src=<%- value %>>
+    <% } else { %>
+      No image uploaded
+    <% } %>
+  </div>
+  <br/>
+  <div id="submit-image-form">
+    <input value="<%- value ? 'Change picture:' : 'Add picture:' %>"
+      id="select-file" type="file">
+    <input id="upload-file" onclick="uploadImage()" value="Upload selected file" type="button">
+  </div>
+</div>
+
+<script>
+  function uploadImage() {
+    var files = document.getElementById('select-file').files; // doesn't work the same way with jQuery selector
+
+    if (!files.length) {
+      return;
+    }
+
+    var fileToUpload = files[0];
+    var formData = new FormData();
+    formData.append('file', fileToUpload);
+
+    var instanceId = '<%- record[idField] %>';
+    var uploadRoute = location.origin + "/service/upload_picture/" + instanceId;
+
+    $.ajax({
+      url: uploadRoute,
+      data: formData,
+      processData: false,
+      contentType: false,
+      type: 'POST',
+      success: function (affectedServices) {
+        var newPictureSrc = affectedServices[0].picture
+        if (!$('#image-uploaded').length) {
+          $('#submit-image-form').append(
+            '<div id="image-uploaded">' +
+              '<span>' +
+                '(Image uploaded. Changes will show after pressing the "Submit" button, bellow)' +
+              '</span>' +
+            '</div>')
+        }
+        // location.reload()
+      }
+    });
+  }
+</script>

@@ -1,6 +1,8 @@
 <% var value = record[key] %>
 <% if (field.model.type == 'boolean') { %>
     <iron-icon icon="<%= value ? "check-circle" : "cancel" %>"></iron-icon>
+<% } else if (field.config.type === 'image') { %>
+    <img class='image-field' src=<%- value %>>
 <% } else if (field.model.type == 'text') { %>
     <%- value %>
 <% } else if (field.model.type == 'json') { %>
