@@ -50,6 +50,8 @@ module.exports = function (req, res) {
               _.merge(record, reqData) // merging values from request to record
               var params = {}
               params[req._sails.config.adminpanel.identifierField] = req.param('id')
+              delete reqData.pictureFd
+              delete reqData.picture
               instance.model.update(params, reqData).exec(function (err, newRecord) {
                 if (err) {
                   req._sails.log.error(err)
