@@ -6,6 +6,7 @@ var requestProcessor = require('../lib/requestProcessor');
 var views = require('../helper/viewsHelper');
 var fieldsHelper = require('../helper/fieldsHelper');
 var sortingHelper = require('../helper/sortingHelper');
+var pluralize = require('pluralize')
 
 var async = require('async');
 
@@ -67,6 +68,7 @@ module.exports = function(req, res) {
         res.viewAdmin({
             requestProcessor: requestProcessor,
             sortingHelper: sortingHelper,
+            pluralize: pluralize,
             instance: instance,
             total: total,
             list: records,
