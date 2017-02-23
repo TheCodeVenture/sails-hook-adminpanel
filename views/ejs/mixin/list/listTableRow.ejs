@@ -12,11 +12,21 @@
             <% } else if (typeof value === 'string') { %>
                 <%= value %>
             <% } else { %>
-                <%= value && value[field.config.displayField] ? value[field.config.displayField] : '&nbsp;' %>
+                <% if (value && value[field.config.displayField]) { %>
+                  <a href='/admin/<%= pluralize(field.model.model.charAt(0).toLowerCase() + field.model.model.slice(1)) %>/view/<%= value[field.config.identifierField] %>'>
+                    <%= value[field.config.displayField] %>
+                  </a>
+                <% } else { %>
+                  &nbsp;
+                <% } %>
             <% } %>
         <% } else if(field.model.type == "association-many") { %>
             <% if(value.length){ %>
-                <%= _.pluck(value, field.config.displayField).join(', ') %>
+                <% value.forEach(function (elem) { %>
+                  <a href='/admin/<%= pluralize(field.model.collection.charAt(0).toLowerCase() + field.model.collection.slice(1))%>/view/<%= elem[field.config.identifierField] %>'>
+                    <%= elem[field.config.displayField] %>
+                  </a><br/>
+                <% }) %>
             <% }else{ %>
                &nbsp;
             <% } %>
